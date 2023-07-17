@@ -1,0 +1,128 @@
+--For this project, I downloaded Spotify data from Kaggle.
+--Then I created a table to insert Spotify data into.
+--Finally, I formulated some questions I had about the data, and performed analytics on the data using SQL. 
+
+
+CREATE TABLE BIT_DB.Spotifydata (
+id integer PRIMARY KEY,
+artist_name varchar NOT NULL,
+track_name varchar NOT NULL,
+track_id varchar NOT NULL,
+popularity integer NOT NULL,
+danceability decimal(4,3) NOT NULL,
+energy decimal(4,3) NOT NULL,
+song_key integer NOT NULL,
+loudness decimal(5,3) NOT NULL,
+song_mode integer NOT NULL,
+speechiness decimal(5,4) NOT NULL,
+acousticness decimal(6,5) NOT NULL,
+instrumentalness decimal(8,7) NOT NULL,
+liveness decimal(5,4) NOT NULL,
+valence decimal(4,3) NOT NULL,
+tempo decimal(6,3) NOT NULL,
+duration_ms integer NOT NULL,
+time_signature integer NOT NULL)
+;
+
+--First, I wanted to look at the data.
+SELECT *
+FROM BIT_DB.Spotifydata
+;
+
+
+--Change the keys to the actual letter key.
+    CASE 
+        WHEN song_key = 0 THEN "C"
+        WHEN song_key = 1 THEN "C♯/D♭"
+        WHEN song_key = 2 THEN "D"
+        WHEN song_key = 3 THEN "D♯/E♭"
+        WHEN song_key = 4 THEN "E"
+        WHEN song_key = 5 THEN "F"
+        WHEN song_key = 6 THEN "F♯/G♭"
+        WHEN song_key = 7 THEN "G"
+        WHEN song_key = 8 THEN "G♯/A♭"
+        WHEN song_key = 9 THEN "A"
+        WHEN song_key = 10 THEN "A♯/B♭"
+        WHEN song_key = 11 THEN "B"
+        ELSE null 
+    END AS song_key
+FROM BIT_DB.Spotifydata
+;
+
+
+--Which artists have more than one song?
+SELECT artist_name
+FROM BIT_DB.Spotifydata
+Group BY artist_name
+HAVING count(track_id)>1
+;
+
+--Which artist has the most songs (include all who tie for first place)?
+SELECT
+    artist_name,
+    COUNT(track_id) AS songs
+FROM BIT_DB.Spotifydata
+Group BY artist_name
+HAVING songs>1
+ORDER BY songs DESC
+LIMIT 2
+;
+
+--Who are the top 10 artists based on popularity?
+SELECT 
+    artist_name, avg(popularity) AS avg_popularity
+FROM BIT_DB.Spotifydata
+GROUP BY artist_name
+ORDER BY avg_popularity DESC
+LIMIT 10
+;
+ 
+--What is the longest song?
+SELECT 
+    artist_name,
+    track_name
+FROM BIT_DB.Spotifydata
+Group BY track_name
+ORDER BY duration_ms DESC
+LIMIT 1
+;
+
+--What is the shortest song?
+SELECT 
+    artist_name,
+    track_name
+FROM BIT_DB.Spotifydata
+Group BY track_name
+ORDER BY duration_ms ASC
+LIMIT 1
+;
+
+--What is the most popular song?
+SELECT 
+    artist_name,
+    track_name
+FROM BIT_DB.Spotifydata
+Group BY track_name
+ORDER BY popularity DESC
+LIMIT 1
+;
+
+--What is the least popular song?
+SELECT 
+    artist_name,
+    track_name
+FROM BIT_DB.Spotifydata
+Group BY track_name
+ORDER BY popularity ASC
+LIMIT 1
+;
+
+--What is the most dancable song?
+SELECT 
+    artist_name,
+    track_name
+FROM BIT_DB.Spotifydata
+Group BY track_name
+ORDER BY danceability DESC
+LIMIT 1
+;
