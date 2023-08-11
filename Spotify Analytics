@@ -24,14 +24,24 @@ duration_ms integer NOT NULL,
 time_signature integer NOT NULL)
 ;
 
+
 --First, I wanted to look at the data.
+
 SELECT *
 FROM BIT_DB.Spotifydata
 ;
 
+--I immediately noticed the keys were numerically coded rather than a letter key, so I did some quick research to translate those into the letter version. 
+--I created a new column in the table to insert the letter verions into in case the numerical coding becomes necessary in the future.
 
---Change the keys to the actual letter key.
-    CASE 
+ALTER TABLE BIT_DB.Spotifydata
+    ADD letter_key varchar(255);
+;
+
+--I then inserted all the letter keys into the new column.
+
+UPDATE BIT_DB.Spotifydata
+    SET letter_key = CASE 
         WHEN song_key = 0 THEN "C"
         WHEN song_key = 1 THEN "C♯/D♭"
         WHEN song_key = 2 THEN "D"
@@ -44,20 +54,33 @@ FROM BIT_DB.Spotifydata
         WHEN song_key = 9 THEN "A"
         WHEN song_key = 10 THEN "A♯/B♭"
         WHEN song_key = 11 THEN "B"
-        ELSE null 
-    END AS song_key
+        ELSE null
+    END
+;
+
+--I then looked into the statistics I was curious about. I put these in question and answer format for simplicity.
+
+
+--How many songs are there in each key?
+
+SELECT letter_key, COUNT(letter_key) AS song_amount
 FROM BIT_DB.Spotifydata
+GROUP BY letter_key
+ORDER BY song_key ASC
 ;
 
 
 --Which artists have more than one song?
+
 SELECT artist_name
 FROM BIT_DB.Spotifydata
 Group BY artist_name
 HAVING count(track_id)>1
 ;
 
+
 --Which artist has the most songs (include all who tie for first place)?
+
 SELECT
     artist_name,
     COUNT(track_id) AS songs
@@ -68,7 +91,11 @@ ORDER BY songs DESC
 LIMIT 2
 ;
 
+--Note: I first looked at the results of querey without limiting it to see who had the most songs. I then limited it when I saw that two artists tied for the top spot.
+
+
 --Who are the top 10 artists based on popularity?
+
 SELECT 
     artist_name, avg(popularity) AS avg_popularity
 FROM BIT_DB.Spotifydata
@@ -76,8 +103,10 @@ GROUP BY artist_name
 ORDER BY avg_popularity DESC
 LIMIT 10
 ;
- 
+
+
 --What is the longest song?
+
 SELECT 
     artist_name,
     track_name
@@ -87,7 +116,9 @@ ORDER BY duration_ms DESC
 LIMIT 1
 ;
 
+
 --What is the shortest song?
+
 SELECT 
     artist_name,
     track_name
@@ -97,7 +128,9 @@ ORDER BY duration_ms ASC
 LIMIT 1
 ;
 
+
 --What is the most popular song?
+
 SELECT 
     artist_name,
     track_name
@@ -107,7 +140,9 @@ ORDER BY popularity DESC
 LIMIT 1
 ;
 
+
 --What is the least popular song?
+
 SELECT 
     artist_name,
     track_name
@@ -117,7 +152,9 @@ ORDER BY popularity ASC
 LIMIT 1
 ;
 
+
 --What is the most dancable song?
+
 SELECT 
     artist_name,
     track_name
@@ -126,3 +163,6 @@ Group BY track_name
 ORDER BY danceability DESC
 LIMIT 1
 ;
+
+
+--This could go on for a while until I see every single statistic, but I decided to stop here for this project.
